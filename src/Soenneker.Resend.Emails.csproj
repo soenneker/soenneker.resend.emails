@@ -43,6 +43,6 @@
 
     <ItemGroup>
         <PackageReference Include="Soenneker.Extensions.Enumerable.String" Version="3.0.1189" />
-        <PackageReference Include="Soenneker.Resend.ClientUtil" Version="3.0.18" />
+        <PackageReference Include="Soenneker.Resend.ClientUtil" Version="3.0.19" />
     </ItemGroup>
 </Project>
