@@ -28,24 +28,26 @@ public sealed class ResendEmailsUtil : IResendEmailsUtil
         List<string>? bcc = null, List<string>? replyTo = null, List<Attachment>? attachments = null, List<Tag>? tags = null, string? scheduledAt = null,
         CancellationToken cancellationToken = default)
     {
-        ResendOpenApiClient client = await _clientUtil.Get(cancellationToken).NoSync();
+        ResendOpenApiClient client = await _clientUtil.Get(cancellationToken)
+                                                      .NoSync();
 
         var request = new SendEmailRequest
         {
             From = from,
-            To = to,
+            To = new SendEmailRequest.SendEmailRequest_to { String = to },
             Subject = subject,
             Html = html,
             Text = text,
-            Cc = cc?.ToCommaSeparatedString(),
-            Bcc = bcc?.ToCommaSeparatedString(),
-            ReplyTo = replyTo?.ToCommaSeparatedString(),
+            Cc = new SendEmailRequest.SendEmailRequest_cc { SendEmailRequestCcString = cc?.ToCommaSeparatedString() },
+            Bcc = new SendEmailRequest.SendEmailRequest_bcc { SendEmailRequestBccString = bcc?.ToCommaSeparatedString() },
+            ReplyTo = new SendEmailRequest.SendEmailRequest_reply_to { SendEmailRequestReplyToString = replyTo?.ToCommaSeparatedString() },
             Attachments = attachments,
             Tags = tags,
             ScheduledAt = scheduledAt
         };
 
-        SendEmailResponse? response = await client.Emails.PostAsync(request, null, cancellationToken).NoSync();
+        SendEmailResponse? response = await client.Emails.PostAsync(request, null, cancellationToken)
+                                                  .NoSync();
         return response?.Id;
     }
 
@@ -57,10 +59,13 @@ public sealed class ResendEmailsUtil : IResendEmailsUtil
         if (emails.Count > 100)
             throw new ArgumentException("Maximum of 100 emails can be sent in a batch.", nameof(emails));
 
-        ResendOpenApiClient client = await _clientUtil.Get(cancellationToken).NoSync();
+        ResendOpenApiClient client = await _clientUtil.Get(cancellationToken)
+                                                      .NoSync();
 
-        CreateBatchEmailsResponse? response = await client.Emails.Batch.PostAsync(emails, null, cancellationToken).NoSync();
-        return response?.Data?.Select(e => e.Id).ToList() ?? new List<string>();
+        CreateBatchEmailsResponse? response = await client.Emails.Batch.PostAsync(emails, null, cancellationToken)
+                                                          .NoSync();
+        return response?.Data?.Select(e => e.Id)
+                       .ToList() ?? new List<string>();
     }
 
     public async ValueTask CancelScheduled(string emailId, CancellationToken cancellationToken = default)
@@ -68,9 +73,12 @@ public sealed class ResendEmailsUtil : IResendEmailsUtil
         if (emailId.IsNullOrEmpty())
             throw new ArgumentException("Email ID is required.", nameof(emailId));
 
-        ResendOpenApiClient client = await _clientUtil.Get(cancellationToken).NoSync();
+        ResendOpenApiClient client = await _clientUtil.Get(cancellationToken)
+                                                      .NoSync();
 
-        await client.Emails[emailId].Cancel.PostAsync(null, cancellationToken).NoSync();
+        await client.Emails[emailId]
+                    .Cancel.PostAsync(null, cancellationToken)
+                    .NoSync();
     }
 
     public async ValueTask<Email?> Get(string emailId, CancellationToken cancellationToken = default)
@@ -78,8 +86,11 @@ public sealed class ResendEmailsUtil : IResendEmailsUtil
         if (string.IsNullOrEmpty(emailId))
             throw new ArgumentException("Email ID is required.", nameof(emailId));
 
-        ResendOpenApiClient client = await _clientUtil.Get(cancellationToken).NoSync();
+        ResendOpenApiClient client = await _clientUtil.Get(cancellationToken)
+                                                      .NoSync();
 
-        return await client.Emails[emailId].GetAsync(null, cancellationToken).NoSync();
+        return await client.Emails[emailId]
+                           .GetAsync(null, cancellationToken)
+                           .NoSync();
     }
 }
