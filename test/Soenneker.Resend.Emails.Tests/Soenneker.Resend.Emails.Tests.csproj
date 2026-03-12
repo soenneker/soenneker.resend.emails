@@ -27,7 +27,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\src\Soenneker.Resend.Emails.csproj" />
+        <ProjectReference Include="..\..\src\Soenneker.Resend.Emails\Soenneker.Resend.Emails.csproj" />
     </ItemGroup>
 
     <ItemGroup>
