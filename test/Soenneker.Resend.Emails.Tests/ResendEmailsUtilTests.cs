@@ -1,20 +1,19 @@
-﻿using Soenneker.Resend.Emails.Abstract;
-using Soenneker.Tests.FixturedUnit;
-using Xunit;
+using Soenneker.Resend.Emails.Abstract;
+using Soenneker.Tests.HostedUnit;
 
 namespace Soenneker.Resend.Emails.Tests;
 
-[Collection("Collection")]
-public sealed class ResendEmailsUtilTests : FixturedUnitTest
+[ClassDataSource<Host>(Shared = SharedType.PerTestSession)]
+public sealed class ResendEmailsUtilTests : HostedUnitTest
 {
     private readonly IResendEmailsUtil _util;
 
-    public ResendEmailsUtilTests(Fixture fixture, ITestOutputHelper output) : base(fixture, output)
+    public ResendEmailsUtilTests(Host host) : base(host)
     {
         _util = Resolve<IResendEmailsUtil>(true);
     }
 
-    [Fact]
+    [Test]
     public void Default()
     {
 
