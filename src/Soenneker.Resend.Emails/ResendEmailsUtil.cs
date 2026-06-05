@@ -22,8 +22,8 @@ public sealed class ResendEmailsUtil : IResendEmailsUtil
     {
         _clientUtil = clientUtil;
     }
-
     public async ValueTask<string?> Send(string from, List<string> to, string subject, string? html = null, string? text = null, List<string>? cc = null,
+
         List<string>? bcc = null, List<string>? replyTo = null, List<Attachment>? attachments = null, List<Tag>? tags = null, string? scheduledAt = null,
         CancellationToken cancellationToken = default)
     {
@@ -32,23 +32,30 @@ public sealed class ResendEmailsUtil : IResendEmailsUtil
         var request = new SendEmailRequest
         {
             From = from,
-            To = new SendEmailRequest.SendEmailRequest_to { String = to },
             Subject = subject,
             Html = html,
             Text = text,
-            Cc = cc is { Count: > 0 } ? new SendEmailRequest.SendEmailRequest_cc { String = cc } : null,
-            Bcc = bcc is { Count: > 0 } ? new SendEmailRequest.SendEmailRequest_bcc { String = bcc } : null,
-            ReplyTo = replyTo is { Count: > 0 } ? new SendEmailRequest.SendEmailRequest_reply_to { String = replyTo } : null,
             Attachments = attachments,
             Tags = tags,
             ScheduledAt = scheduledAt
         };
 
+        request.AdditionalData["to"] = to;
+
+        if (cc is { Count: > 0 })
+            request.AdditionalData["cc"] = cc;
+
+        if (bcc is { Count: > 0 })
+            request.AdditionalData["bcc"] = bcc;
+
+        if (replyTo is { Count: > 0 })
+            request.AdditionalData["reply_to"] = replyTo;
+
         SendEmailResponse? response = await client.Emails.PostAsync(request, null, cancellationToken).NoSync();
         return response?.Id;
     }
-
     public async ValueTask<List<string>> SendBatch(List<SendEmailRequest> emails, CancellationToken cancellationToken = default)
+
     {
         if (emails == null || emails.Count == 0)
             throw new ArgumentException("At least one email request is required.", nameof(emails));
@@ -59,10 +66,10 @@ public sealed class ResendEmailsUtil : IResendEmailsUtil
         ResendOpenApiClient client = await _clientUtil.Get(cancellationToken).NoSync();
 
         CreateBatchEmailsResponse? response = await client.Emails.Batch.PostAsync(emails, null, cancellationToken).NoSync();
-        return response?.Data?.Select(e => e.Id).ToList() ?? new List<string>();
+        return response?.Data?.Select(e => e.Id).Where(id => id is not null).Select(id => id!).ToList() ?? [];
     }
-
     public async ValueTask CancelScheduled(string emailId, CancellationToken cancellationToken = default)
+
     {
         if (emailId.IsNullOrEmpty())
             throw new ArgumentException("Email ID is required.", nameof(emailId));
@@ -71,8 +78,8 @@ public sealed class ResendEmailsUtil : IResendEmailsUtil
 
         await client.Emails[emailId].Cancel.PostAsync(null, cancellationToken).NoSync();
     }
-
     public async ValueTask<Email?> Get(string emailId, CancellationToken cancellationToken = default)
+
     {
         if (string.IsNullOrEmpty(emailId))
             throw new ArgumentException("Email ID is required.", nameof(emailId));
