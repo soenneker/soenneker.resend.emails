@@ -6,7 +6,7 @@ using Soenneker.Resend.Emails.Abstract;
 namespace Soenneker.Resend.Emails.Registrars;
 
 /// <summary>
-/// A utility library for email related Resend operations
+/// Registers the Resend email sending and retrieval client.
 /// </summary>
 public static class ResendEmailsUtilRegistrar
 {

@@ -13,7 +13,6 @@ using System.Threading.Tasks;
 
 namespace Soenneker.Resend.Emails;
 
-///<inheritdoc cref="IResendEmailsUtil"/>
 public sealed class ResendEmailsUtil : IResendEmailsUtil
 {
     private readonly IResendClientUtil _clientUtil;
@@ -57,12 +56,6 @@ public sealed class ResendEmailsUtil : IResendEmailsUtil
     public async ValueTask<List<string>> SendBatch(List<SendEmailRequest> emails, CancellationToken cancellationToken = default)
 
     {
-        if (emails == null || emails.Count == 0)
-            throw new ArgumentException("At least one email request is required.", nameof(emails));
-
-        if (emails.Count > 100)
-            throw new ArgumentException("Maximum of 100 emails can be sent in a batch.", nameof(emails));
-
         ResendOpenApiClient client = await _clientUtil.Get(cancellationToken).NoSync();
 
         CreateBatchEmailsResponse? response = await client.Emails.Batch.PostAsync(emails, null, cancellationToken).NoSync();
@@ -71,9 +64,6 @@ public sealed class ResendEmailsUtil : IResendEmailsUtil
     public async ValueTask CancelScheduled(string emailId, CancellationToken cancellationToken = default)
 
     {
-        if (emailId.IsNullOrEmpty())
-            throw new ArgumentException("Email ID is required.", nameof(emailId));
-
         ResendOpenApiClient client = await _clientUtil.Get(cancellationToken).NoSync();
 
         await client.Emails[emailId].Cancel.PostAsync(null, cancellationToken).NoSync();
@@ -81,9 +71,6 @@ public sealed class ResendEmailsUtil : IResendEmailsUtil
     public async ValueTask<Email?> Get(string emailId, CancellationToken cancellationToken = default)
 
     {
-        if (string.IsNullOrEmpty(emailId))
-            throw new ArgumentException("Email ID is required.", nameof(emailId));
-
         ResendOpenApiClient client = await _clientUtil.Get(cancellationToken).NoSync();
 
         return await client.Emails[emailId].GetAsync(null, cancellationToken).NoSync();
