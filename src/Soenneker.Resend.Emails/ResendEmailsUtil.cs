@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 
 namespace Soenneker.Resend.Emails;
 
+/// <inheritdoc cref="IResendEmailsUtil" />
 public sealed class ResendEmailsUtil : IResendEmailsUtil
 {
     private readonly IResendClientUtil _clientUtil;
