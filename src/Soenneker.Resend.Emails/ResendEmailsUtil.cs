@@ -60,7 +60,16 @@ public sealed class ResendEmailsUtil : IResendEmailsUtil
         ResendOpenApiClient client = await _clientUtil.Get(cancellationToken).NoSync();
 
         CreateBatchEmailsResponse? response = await client.Emails.Batch.PostAsync(emails, null, cancellationToken).NoSync();
-        return response?.Data?.Select(e => e.Id).Where(id => id is not null).Select(id => id!).ToList() ?? [];
+        var ids = new List<string>();
+        if (response?.Data is { } data)
+        {
+            foreach (var email in data)
+            {
+                if (email.Id is { } id)
+                    ids.Add(id);
+            }
+        }
+        return ids;
     }
     public async ValueTask CancelScheduled(string emailId, CancellationToken cancellationToken = default)
 
