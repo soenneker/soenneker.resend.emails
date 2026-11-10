@@ -29,27 +29,8 @@ public sealed class ResendEmailsUtil : IResendEmailsUtil
     {
         ResendOpenApiClient client = await _clientUtil.Get(cancellationToken).NoSync();
 
-        var request = new SendEmailRequest
-        {
-            From = from,
-            Subject = subject,
-            Html = html,
-            Text = text,
-            Attachments = attachments,
-            Tags = tags,
-            ScheduledAt = scheduledAt
-        };
-
-        request.AdditionalData["to"] = to;
-
-        if (cc is { Count: > 0 })
-            request.AdditionalData["cc"] = cc;
-
-        if (bcc is { Count: > 0 })
-            request.AdditionalData["bcc"] = bcc;
-
-        if (replyTo is { Count: > 0 })
-            request.AdditionalData["reply_to"] = replyTo;
+        SendEmailRequest request = ResendEmailRequestFactory.Create(from, to, subject, html, text, cc, bcc,
+            replyTo, attachments, tags, scheduledAt);
 
         SendEmailResponse? response = await client.Emails.PostAsync(request, null, cancellationToken).NoSync();
         return response?.Id;

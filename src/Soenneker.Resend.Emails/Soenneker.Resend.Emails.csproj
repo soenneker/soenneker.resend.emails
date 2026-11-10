@@ -48,4 +48,7 @@
     <ItemGroup>
         <PackageReference Include="Soenneker.Resend.ClientUtil" Version="11.0.415" />
     </ItemGroup>
+    <ItemGroup>
+        <InternalsVisibleTo Include="Soenneker.Resend.Emails.Tests" />
+    </ItemGroup>
 </Project>
