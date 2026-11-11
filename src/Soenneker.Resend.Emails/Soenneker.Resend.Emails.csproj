@@ -46,7 +46,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Soenneker.Resend.ClientUtil" Version="11.0.418" />
+        <PackageReference Include="Soenneker.Resend.ClientUtil" Version="11.0.419" />
     </ItemGroup>
     <ItemGroup>
         <InternalsVisibleTo Include="Soenneker.Resend.Emails.Tests" />
